@@ -9,7 +9,7 @@ export async function GET(context: { site?: URL }) {
   return rss({
     title: 'Hshevin 的文章',
     description: '学习记录、项目复盘与偶尔产生的想法。',
-    site: context.site ?? 'https://personal-page.workers.dev',
+    site: context.site ?? 'https://personal-page.example',
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
