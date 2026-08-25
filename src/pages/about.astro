@@ -1,0 +1,169 @@
+---
+import { getCollection } from 'astro:content';
+
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const [profile] = await getCollection('profile');
+---
+
+<BaseLayout title="关于" description={`关于 ${profile.data.name} 与这个站点。`}>
+  <PageHeader eyebrow="About" title="关于" description={profile.data.tagline} />
+
+  <div class="about narrow-shell">
+    <section class="intro" aria-labelledby="about-me-heading">
+      <img src={profile.data.avatar} alt={`${profile.data.name} 的头像`} width="96" height="96" />
+      <div>
+        <h2 id="about-me-heading">你好，我是 {profile.data.name}</h2>
+        {profile.data.bio.map((paragraph) => <p>{paragraph}</p>)}
+        <ul class="socials" aria-label="社交链接">
+          {
+            profile.data.socials.map((social) => (
+              <li>
+                <a href={social.url} target="_blank" rel="me noopener noreferrer">
+                  {social.label} <Icon name="external" size={15} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    {
+      profile.data.education.length > 0 && (
+        <section aria-labelledby="education-heading">
+          <h2 id="education-heading">教育经历</h2>
+          <ol class="timeline">
+            {profile.data.education.map((item) => (
+              <li>
+                <span>{item.period}</span>
+                <div>
+                  <h3>{item.institution}</h3>
+                  <p>{item.program}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="skills-heading">
+      <h2 id="skills-heading">技能与工具</h2>
+      <div class="skill-groups">
+        {
+          profile.data.skills.map((group) => (
+            <section>
+              <h3>{group.category}</h3>
+              <ul>
+                {group.items.map((item) => <li>{item}</li>)}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="site-heading">
+      <h2 id="site-heading">关于这个站点</h2>
+      <div class="site-copy">
+        <p>本站以 Astro 构建，内容保存在 Markdown、MDX 与 YAML 文件中，并通过 Git 记录每一次修改。</p>
+        <p>站点静态生成后部署到 Cloudflare Workers，不需要数据库或管理后台。搜索索引同样在构建阶段生成。</p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    padding-block: 3rem 5rem;
+  }
+
+  .about > section {
+    padding-block: 2.5rem;
+  }
+
+  .about > section + section {
+    border-block-start: 1px solid var(--line-soft);
+  }
+
+  .intro {
+    display: grid;
+    padding-block-start: 0 !important;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .intro img {
+    border: 1px solid var(--line);
+    border-radius: 50%;
+  }
+
+  .about > section > h2,
+  .intro h2 {
+    font-size: 1.55rem;
+  }
+
+  .intro p,
+  .site-copy p {
+    margin-block-start: 0.75rem;
+  }
+
+  .socials,
+  .skill-groups ul {
+    display: flex;
+    margin: 1rem 0 0;
+    padding: 0;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    list-style: none;
+  }
+
+  .socials a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--accent-strong);
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .skill-groups {
+    display: grid;
+    margin-block-start: 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .skill-groups h3 {
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .skill-groups li {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .site-copy {
+    margin-block-start: 1rem;
+  }
+
+  @media (max-width: 40rem) {
+    .intro,
+    .skill-groups {
+      grid-template-columns: 1fr;
+    }
+
+    .intro img {
+      width: 4.5rem;
+      height: 4.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,106 @@
+---
+import { getCollection } from 'astro:content';
+
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const links = (await getCollection('links')).toSorted(
+  (left, right) => right.data.order - left.data.order,
+);
+const grouped = Map.groupBy(links, ({ data }) => data.category);
+---
+
+<BaseLayout title="链接" description="朋友们的站点，以及值得常常回访的地方。">
+  <PageHeader eyebrow={`${links.length} 个站点`} title="链接" description="朋友们的站点，以及那些让我获得启发、值得常常回访的地方。" />
+  <div class="link-groups narrow-shell">
+    {
+      [...grouped].map(([category, entries]) => (
+        <section aria-labelledby={`category-${category}`}>
+          <h2 id={`category-${category}`}>{category}</h2>
+          <div class="link-grid">
+            {entries.map((entry) => (
+              <a href={entry.data.url} target="_blank" rel="noopener noreferrer">
+                <img src={entry.data.avatar} alt="" width="48" height="48" loading="lazy" />
+                <div>
+                  <h3>{entry.data.name}</h3>
+                  <p>{entry.data.description}</p>
+                </div>
+                <Icon name="external" size={15} />
+              </a>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .link-groups {
+    padding-block: 3rem 5rem;
+  }
+
+  section + section {
+    margin-block-start: 3rem;
+  }
+
+  section > h2 {
+    margin-block-end: 1rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .link-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .link-grid a {
+    display: grid;
+    padding: 1rem;
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.875rem;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+
+  .link-grid a:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--paper-soft);
+    object-fit: cover;
+  }
+
+  h3 {
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+
+  p {
+    margin-block-start: 0.2rem;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 42rem) {
+    .link-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

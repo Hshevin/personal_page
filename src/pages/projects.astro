@@ -1,0 +1,117 @@
+---
+import { getCollection } from 'astro:content';
+
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const projects = (await getCollection('projects')).toSorted(
+  (left, right) => right.data.order - left.data.order,
+);
+---
+
+<BaseLayout title="项目" description="正在构建和持续维护的项目。">
+  <PageHeader eyebrow={`${projects.length} 个项目`} title="项目" description="把想法做成能够运行、能够使用，也能够继续迭代的东西。" />
+  <div class="projects narrow-shell">
+    {
+      projects.map((project, index) => (
+        <article>
+          <header>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            {project.data.featured && <small>Featured</small>}
+          </header>
+          <h2>{project.data.title}</h2>
+          <p>{project.data.summary}</p>
+          <ul class="stack" aria-label={`${project.data.title} 技术栈`}>
+            {project.data.stack.map((item) => <li>{item}</li>)}
+          </ul>
+          {project.data.links.length > 0 && (
+            <ul class="project-links" aria-label={`${project.data.title} 相关链接`}>
+              {project.data.links.map((link) => (
+                <li>
+                  <a href={link.url} target="_blank" rel="noopener noreferrer">
+                    {link.label} <Icon name="external" size={15} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .projects {
+    display: grid;
+    padding-block: 3rem 5rem;
+    gap: 1rem;
+  }
+
+  article {
+    padding: 1.5rem;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  article:hover {
+    border-color: var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    color: var(--warm);
+    font-family: ui-monospace, monospace;
+    font-size: 0.75rem;
+  }
+
+  small {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin-block-start: 1.5rem;
+    font-size: 1.75rem;
+  }
+
+  article > p {
+    margin-block-start: 0.625rem;
+    color: var(--text-muted);
+  }
+
+  ul {
+    display: flex;
+    margin: 1rem 0 0;
+    padding: 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+  }
+
+  .stack li {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .project-links {
+    margin-block-start: 1.5rem;
+  }
+
+  .project-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--accent-strong);
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+</style>
