@@ -7,7 +7,7 @@ import rehypeSlug from 'rehype-slug';
 import remarkMath from 'remark-math';
 
 export default defineConfig({
-  site: 'https://personal-page.example',
+  site: process.env.SITE_URL ?? 'https://personal-page.example',
   integrations: [mdx(), sitemap()],
   markdown: {
     processor: unified({

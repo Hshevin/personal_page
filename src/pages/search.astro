@@ -1,0 +1,181 @@
+---
+import PageHeader from '../components/PageHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="搜索" description="搜索站内文章和页面。">
+  <div data-pagefind-ignore>
+    <PageHeader eyebrow="Search" title="搜索" description="输入关键词，查找文章标题、标签与正文内容。" />
+    <section class="search-shell narrow-shell" aria-labelledby="search-label">
+      <label id="search-label" for="search-input">关键词</label>
+      <div class="search-field">
+        <input id="search-input" type="search" autocomplete="off" placeholder="例如：Astro、Markdown、学习……" />
+        <kbd>⌘ K</kbd>
+      </div>
+      <p class="search-status" id="search-status" role="status" aria-live="polite">输入关键词开始搜索。</p>
+      <ol class="search-results" id="search-results"></ol>
+    </section>
+  </div>
+</BaseLayout>
+
+<!-- Pagefind is generated after Astro builds, so this native module must not be rewritten by Vite. -->
+<script is:inline type="module">
+  const input = document.querySelector('#search-input');
+  const results = document.querySelector('#search-results');
+  const status = document.querySelector('#search-status');
+  let pagefind;
+
+  const setStatus = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  const loadPagefind = async () => {
+    if (pagefind) return pagefind;
+
+    try {
+      pagefind = await import('/pagefind/pagefind.js');
+      await pagefind.init();
+      return pagefind;
+    } catch {
+      setStatus('搜索索引仅在生产构建后可用，请先运行 npm run build。');
+      return undefined;
+    }
+  };
+
+  const renderResults = async (term) => {
+    if (!results) return;
+    results.replaceChildren();
+
+    if (!term.trim()) {
+      setStatus('输入关键词开始搜索。');
+      return;
+    }
+
+    setStatus('正在搜索……');
+    const search = await loadPagefind();
+    const response = await search?.debouncedSearch(term.trim());
+    if (!response) return;
+
+    const entries = await Promise.all(response.results.slice(0, 12).map((result) => result.data()));
+    setStatus(entries.length > 0 ? `找到 ${entries.length} 条结果。` : '没有找到相关内容。');
+
+    for (const entry of entries) {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      const title = document.createElement('h2');
+      const excerpt = document.createElement('p');
+
+      link.href = entry.url;
+      title.textContent = entry.meta.title ?? '未命名页面';
+      excerpt.textContent = entry.plain_excerpt;
+      link.append(title, excerpt);
+      item.append(link);
+      results.append(item);
+    }
+  };
+
+  input?.addEventListener('focus', () => void loadPagefind(), { once: true });
+  input?.addEventListener('input', () => {
+    const term = input.value;
+    const url = new URL(window.location.href);
+    term ? url.searchParams.set('q', term) : url.searchParams.delete('q');
+    history.replaceState(null, '', url);
+    void renderResults(term);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      input?.focus();
+    }
+  });
+
+  const initialQuery = new URL(window.location.href).searchParams.get('q');
+  if (initialQuery && input) {
+    input.value = initialQuery;
+    void renderResults(initialQuery);
+  }
+</script>
+
+<style>
+  .search-shell {
+    padding-block: 3rem 5rem;
+  }
+
+  label {
+    display: block;
+    margin-block-end: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+
+  .search-field {
+    position: relative;
+  }
+
+  input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 4rem 0.75rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--text-strong);
+    background: var(--surface);
+    font: inherit;
+  }
+
+  input::placeholder {
+    color: var(--text-muted);
+  }
+
+  input:focus {
+    border-color: var(--accent);
+  }
+
+  kbd {
+    position: absolute;
+    top: 50%;
+    right: 0.875rem;
+    padding: 0.1rem 0.4rem;
+    transform: translateY(-50%);
+    border: 1px solid var(--line-soft);
+    border-radius: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+  }
+
+  .search-status {
+    margin-block: 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .search-results {
+    margin: 0;
+    padding: 0;
+    border-block-start: 1px solid var(--line);
+    list-style: none;
+  }
+
+  .search-results :global(li) {
+    border-block-end: 1px solid var(--line-soft);
+  }
+
+  .search-results :global(a) {
+    display: block;
+    padding-block: 1.25rem;
+    text-decoration: none;
+  }
+
+  .search-results :global(h2) {
+    font-family: inherit;
+    font-size: 1.05rem;
+  }
+
+  .search-results :global(p) {
+    margin-block-start: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+</style>

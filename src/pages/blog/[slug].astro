@@ -31,10 +31,10 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
   image={post.data.cover}
   article
 >
-  <article class="article-shell" data-pagefind-body>
-    <header class="article-header" data-pagefind-meta="title">
+  <article class="article-shell">
+    <header class="article-header">
       <a class="back-link" href="/blog">← 返回文章列表</a>
-      <h1>{post.data.title}</h1>
+      <h1 data-pagefind-meta="title">{post.data.title}</h1>
       <p>{post.data.description}</p>
       <div class="article-meta">
         <time datetime={post.data.publishedAt.toISOString()}>
