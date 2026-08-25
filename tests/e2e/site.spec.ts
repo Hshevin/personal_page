@@ -10,6 +10,16 @@ test('首页呈现个人信息与主要内容入口', async ({ page }) => {
   await expect(page.getByRole('link', { name: '查看全部项目' })).toBeVisible();
 });
 
+test('首页在关键响应式宽度内没有水平溢出', async ({ page }) => {
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+
+    await expect(page.getByRole('heading', { level: 1, name: 'Hshevin' })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  }
+});
+
 test('访客可以从文章列表进入正文', async ({ page }) => {
   await page.goto('/blog/');
 
