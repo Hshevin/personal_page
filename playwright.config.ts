@@ -13,7 +13,7 @@ export default defineConfig({
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
   webServer: {
-    command: 'npm run dev -- --host 127.0.0.1',
+    command: 'npx wrangler dev --local --ip 127.0.0.1 --port 4321 --show-interactive-dev-session false',
     url: 'http://127.0.0.1:4321',
     reuseExistingServer: !process.env.CI,
   },
