@@ -1,0 +1,13 @@
+- id: personal-page
+  title: 个人主页
+  summary: 一个以内容为核心的静态个人站，用来记录学习、展示项目并收纳友链。
+  stack:
+    - Astro
+    - TypeScript
+    - MDX
+    - Cloudflare Workers
+  links:
+    - label: GitHub
+      url: https://github.com/Hshevin/personal_page
+  featured: true
+  order: 10

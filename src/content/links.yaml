@@ -1,0 +1,7 @@
+- id: arthals-ink
+  name: Arthals' ink
+  url: https://arthals.ink/
+  avatar: https://arthals.ink/favicon.svg
+  description: 本站排版与信息层级的设计参考。
+  category: 设计参考
+  order: 10
