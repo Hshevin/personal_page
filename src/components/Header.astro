@@ -1,0 +1,64 @@
+---
+import Icon from './Icon.astro';
+
+const pathname = Astro.url.pathname;
+const navItems = [
+  { href: '/blog', label: '文章' },
+  { href: '/projects', label: '项目' },
+  { href: '/links', label: '链接' },
+  { href: '/about', label: '关于' },
+];
+
+const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Hshevin 首页">
+      <span class="brand-mark" aria-hidden="true">H</span>
+      <span>Hshevin</span>
+    </a>
+
+    <nav aria-label="主导航">
+      <ul class="nav-list">
+        {
+          navItems.map(({ href, label }) => (
+            <li>
+              <a href={href} aria-current={isActive(href) ? 'page' : undefined}>
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a class="icon-button" href="/search" aria-label="搜索">
+        <Icon name="search" />
+      </a>
+      <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深浅色" aria-pressed="false">
+        <Icon name="moon" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+
+  const syncToggle = () => {
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    toggle?.setAttribute('aria-pressed', String(isDark));
+    toggle?.setAttribute('aria-label', isDark ? '切换到浅色主题' : '切换到深色主题');
+  };
+
+  toggle?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+    syncToggle();
+  });
+
+  syncToggle();
+</script>

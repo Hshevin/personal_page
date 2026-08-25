@@ -1,0 +1,50 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { estimateReadingMinutes } from '../lib/content';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+  compact?: boolean;
+}
+
+const { posts, compact = false } = Astro.props;
+const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric',
+});
+---
+
+{
+  posts.length > 0 ? (
+    <ol class:list={['post-list', { compact }]}>
+      {posts.map((post) => (
+        <li>
+          <a href={`/blog/${post.id}/`}>
+            <time datetime={post.data.publishedAt.toISOString()}>
+              {dateFormatter.format(post.data.publishedAt)}
+            </time>
+            <div class="post-copy">
+              <h3>{post.data.title}</h3>
+              {!compact && <p>{post.data.description}</p>}
+              {!compact && (
+                <span class="post-meta">
+                  {estimateReadingMinutes(post.body ?? '')} 分钟阅读
+                  <span aria-hidden="true">·</span>
+                  {post.data.tags.join(' / ')}
+                </span>
+              )}
+            </div>
+            <span class="post-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <div class="empty-state" role="status">
+      <p>这里还没有公开内容。</p>
+      <span>新的记录正在路上。</span>
+    </div>
+  )
+}

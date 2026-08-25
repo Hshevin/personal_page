@@ -1,0 +1,21 @@
+---
+import Icon from './Icon.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>© {year} Hshevin · 认真记录，缓慢生长。</p>
+    <div class="footer-links">
+      <a href="https://github.com/Hshevin" rel="me noopener noreferrer" target="_blank">
+        <Icon name="github" size={17} />
+        <span>GitHub</span>
+      </a>
+      <a href="/rss.xml">
+        <Icon name="rss" size={17} />
+        <span>RSS</span>
+      </a>
+    </div>
+  </div>
+</footer>
