@@ -1,0 +1,47 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+import PageHeader from '../../components/PageHeader.astro';
+import PostList from '../../components/PostList.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const posts = getPublishedPosts(await getCollection('posts'));
+  const tags = [...new Set(posts.flatMap(({ data }) => data.tags))];
+
+  return tags.map((tag) => ({
+    params: { tag },
+    props: { posts: posts.filter(({ data }) => data.tags.includes(tag)), tag },
+  }));
+}
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+  tag: string;
+}
+
+const { posts, tag } = Astro.props;
+---
+
+<BaseLayout title={`标签：${tag}`} description={`浏览所有带有 ${tag} 标签的文章。`}>
+  <PageHeader eyebrow="Tag" title={`# ${tag}`} description={`共 ${posts.length} 篇记录。`} />
+  <section class="tag-posts narrow-shell" aria-label={`${tag} 标签文章`}>
+    <PostList posts={posts} />
+    <a href="/tags">← 返回全部标签</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .tag-posts {
+    padding-block: 3rem 5rem;
+  }
+
+  .tag-posts > a {
+    display: inline-block;
+    margin-block-start: 2rem;
+    color: var(--accent-strong);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+</style>

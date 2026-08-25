@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+
+import PageHeader from '../../components/PageHeader.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts, getTagCounts } from '../../lib/content';
+
+const posts = getPublishedPosts(await getCollection('posts'));
+const tags = getTagCounts(posts);
+---
+
+<BaseLayout title="标签" description="按照主题浏览全部学习记录。">
+  <PageHeader eyebrow={`${tags.length} 个标签`} title="标签" description="从一个关键词出发，找到同一条学习路径上的记录。" />
+  <ul class="tag-cloud narrow-shell">
+    {
+      tags.map((tag) => (
+        <li>
+          <a href={`/tags/${encodeURIComponent(tag.name)}/`}>
+            <span>{tag.name}</span>
+            <small>{tag.count} 篇</small>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .tag-cloud {
+    display: grid;
+    margin-block: 3rem 5rem;
+    padding: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+  }
+
+  a {
+    display: flex;
+    padding: 1rem;
+    justify-content: space-between;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+
+  a:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  small {
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 36rem) {
+    .tag-cloud {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,111 @@
+---
+import { getCollection } from 'astro:content';
+
+import PageHeader from '../../components/PageHeader.astro';
+import PostList from '../../components/PostList.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts, getTagCounts } from '../../lib/content';
+
+const posts = getPublishedPosts(await getCollection('posts'));
+const tags = getTagCounts(posts);
+---
+
+<BaseLayout title="文章" description="学习记录、项目复盘与偶尔产生的想法。">
+  <PageHeader eyebrow={`${posts.length} 篇公开文章`} title="文章" description="学习记录、项目复盘，以及那些值得写下来慢慢理解的东西。" />
+
+  <div class="blog-layout narrow-shell">
+    <section aria-labelledby="all-posts-heading">
+      <h2 id="all-posts-heading" class="visually-hidden">全部文章</h2>
+      <PostList posts={posts} />
+    </section>
+
+    <aside aria-labelledby="tag-heading">
+      <h2 id="tag-heading">标签</h2>
+      <ul>
+        {
+          tags.map((tag) => (
+            <li>
+              <a href={`/tags/${encodeURIComponent(tag.name)}/`}>
+                <span>{tag.name}</span>
+                <small>{tag.count}</small>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="archive-link" href="/archives">按年份查看归档 →</a>
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-layout {
+    display: grid;
+    padding-block: 3rem 5rem;
+    grid-template-columns: minmax(0, 1fr) 10rem;
+    gap: 3rem;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  aside {
+    padding-block-start: 0.25rem;
+  }
+
+  aside h2 {
+    font-family: inherit;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  aside ul {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  aside li + li {
+    margin-block-start: 0.5rem;
+  }
+
+  aside li a {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+
+  aside small {
+    color: var(--warm);
+  }
+
+  .archive-link {
+    display: block;
+    margin-block-start: 1.5rem;
+    color: var(--accent-strong);
+    font-size: 0.8rem;
+    text-decoration: none;
+  }
+
+  @media (max-width: 48rem) {
+    .blog-layout {
+      grid-template-columns: 1fr;
+    }
+
+    aside {
+      padding-block-start: 2rem;
+      border-block-start: 1px solid var(--line-soft);
+    }
+  }
+</style>
