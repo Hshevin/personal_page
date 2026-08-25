@@ -12,7 +12,7 @@
 
 ## 目标架构
 
-- Astro 6，默认使用静态输出。
+- Astro 7，默认使用静态输出。
 - TypeScript strict。
 - Markdown/MDX 编写文章，Astro Content Collections 负责内容加载、类型和 schema 校验。
 - Pagefind 在构建后生成静态中文搜索索引。

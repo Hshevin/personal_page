@@ -38,7 +38,7 @@
 
 ## 目标技术架构
 
-- Astro 6 静态输出。
+- Astro 7 静态输出。
 - TypeScript strict。
 - Astro Content Collections 管理和校验结构化内容。
 - Markdown/MDX 支持正文、代码、公式和受控嵌入组件。
