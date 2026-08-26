@@ -126,6 +126,15 @@ import Note from '../../components/Note.astro';
 | `education` | 否 | 教育经历数组；没有时写 `[]` 或省略 |
 | `skills` | 是 | 技能分组数组；每组 `items` 至少一项 |
 
+自定义头像可使用 JPG、PNG、WebP 或 SVG。将图片放入 `public/`（例如
+`public/images/avatar.webp`），再把 `avatar` 写成对应的站内绝对路径：
+
+```yaml
+avatar: /images/avatar.webp
+```
+
+首页会从图片中心裁切为圆形；建议使用正方形或主体居中的图片。替换图片后无需修改页面组件。
+
 ## 项目：`projects.yaml`
 
 文件顶层是项目数组；没有项目时完整内容写为 `[]`。

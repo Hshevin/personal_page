@@ -5,6 +5,9 @@ test('首页呈现个人信息与主要内容入口', async ({ page }) => {
 
   await expect(page).toHaveTitle('Hshevin');
   await expect(page.getByRole('heading', { level: 1, name: 'Hshevin' })).toBeVisible();
+  const avatar = page.getByRole('img', { name: 'Hshevin 的头像' });
+  await expect(avatar).toHaveAttribute('src', /.+/);
+  await expect(avatar).toHaveCSS('object-fit', 'cover');
   await expect(page.getByRole('navigation', { name: '主导航' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: '近期文章' })).toBeVisible();
   await expect(page.getByRole('link', { name: '查看全部项目' })).toBeVisible();
