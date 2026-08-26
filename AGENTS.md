@@ -45,6 +45,7 @@
 - `src/content/projects.yaml`：项目名称、简介、技术栈和相关链接。
 - `src/content/links.yaml`：友链名称、网址、头像、描述和分类。
 - `src/content.config.ts`：所有内容 schema 的唯一事实来源。
+- `src/content/README.md`：面向内容编辑者的格式规范；schema 变化时必须同步更新。
 
 文章必须包含 `title`、`description`、`publishedAt`，可使用 `updatedAt`、`tags`、`cover`、`draft` 和 `featured`。新增或调整字段时，先更新 schema，再更新内容示例和 README。`draft: true` 的文章不得进入生产列表、路由、搜索、RSS 或 sitemap。
 

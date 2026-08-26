@@ -61,6 +61,8 @@ npx playwright install chromium
 
 内容与页面代码分离，日常更新不需要数据库或管理后台：
 
+各文件的必填字段、空内容写法和完整示例见 [`src/content/README.md`](./src/content/README.md)。
+
 ```text
 src/content/
 ├── posts/          # Markdown/MDX 学习记录
