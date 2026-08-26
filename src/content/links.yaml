@@ -3,8 +3,16 @@
   url: https://yeyaozhi.eu.cc/
   avatar: https://yeyaozhi.eu.cc/images/luxun-avatar.webp
   description: 中国人民大学高领人工智能学院在读本科生
-  category: 朋友
+  category: 友链
   order: 0
+
+- id: lkj-site
+  name: 卢科均的个人站
+  url: https://lkj-louis.github.io/my-personal-info-page/
+  avatar: https://avatars.githubusercontent.com/u/190489325?v=4
+  description: 宁波大学经济学大一新生
+  category: 友链
+  order: 1
 
 - id: science-feat-kasane_teto
   name: MIMI - Science (feat. Kasane Teto SV)
