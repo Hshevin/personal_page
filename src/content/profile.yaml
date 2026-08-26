@@ -3,8 +3,7 @@
   tagline: 持续学习，也持续记录。
   avatar: /avatar.svg
   bio:
-    - 你好，我是 Hshevin。这里用于整理我的学习过程、项目实践与一路遇见的有趣站点。
-    - 我希望把零散的思考沉淀成可以检索、可以复用，也经得起时间回看的文字。
+    - 你好，我是 Hshevin。这里用于整理我的生活。
   socials:
     - label: GitHub
       url: https://github.com/Hshevin
@@ -12,11 +11,11 @@
   skills:
     - category: 正在学习
       items:
-        - Web Development
+        - Deep Lerning
         - Open Source
         - Technical Writing
     - category: 常用工具
       items:
         - Git
-        - Markdown
+        - Nvim
         - VS Code
