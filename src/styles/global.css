@@ -117,10 +117,11 @@ p { margin-block: 0; }
   width: 1.875rem;
   height: 1.875rem;
   place-items: center;
-  border: 1px solid var(--accent);
-  border-radius: 50%;
-  color: var(--accent-strong);
-  font-family: ui-serif, Georgia, serif;
+  border-radius: 0.5rem;
+  color: var(--paper);
+  background: var(--accent);
+  font-size: 0.9375rem;
+  font-weight: 700;
 }
 .site-header nav { margin-inline-start: auto; }
 .nav-list { display: flex; margin: 0; padding: 0; gap: 0.25rem; list-style: none; }
