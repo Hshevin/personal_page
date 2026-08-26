@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title description">
   <title id="title">Hshevin 的字母头像</title>
-  <desc id="description">米白色圆形背景上的深绿色字母 H</desc>
-  <circle cx="80" cy="80" r="78" fill="#f2ede2" stroke="#c9bfae" stroke-width="4"/>
-  <path fill="#285e58" d="M46 40h18v31h32V40h18v80H96V88H64v32H46z"/>
+  <desc id="description">浅色圆形背景上的靛蓝色字母 H</desc>
+  <circle cx="80" cy="80" r="78" fill="#eef0f3" stroke="#d8dde3" stroke-width="4"/>
+  <path fill="#4f46e5" d="M46 40h18v31h32V40h18v80H96V88H64v32H46z"/>
 </svg>

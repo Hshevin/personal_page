@@ -5,8 +5,8 @@
   "lang": "zh-CN",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f1e8",
-  "theme_color": "#28665f",
+  "background_color": "#fafbfc",
+  "theme_color": "#4f46e5",
   "icons": [
     {
       "src": "/avatar.svg",
