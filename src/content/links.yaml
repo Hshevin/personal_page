@@ -5,3 +5,11 @@
   description: 中国人民大学高领人工智能学院在读本科生
   category: 朋友
   order: 0
+
+- id: science-feat-kasane_teto
+  name: MIMI - Science (feat. Kasane Teto SV)
+  url: https://www.youtube.com/watch?v=m-bvW4pKT68&list=RDGMEMCMFH2exzjBeE_zAHHJOdxg&index=18
+  avatar: https://i.ytimg.com/vi/m-bvW4pKT68/hqdefault.jpg?sqp=-oaymwEjCPYBEIoBSFryq4qpAxUIARUAAAAAGAElAADIQj0AgKJDeAE=&rs=AOn4CLAzIvPX8q6JAxjC7C0NSkG_YT_s_g
+  description: 我很喜欢的一首歌
+  category: other
+  order: 1
