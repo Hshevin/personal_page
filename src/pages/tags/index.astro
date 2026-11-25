@@ -39,16 +39,18 @@ const tags = getTagCounts(posts);
     display: flex;
     padding: 0.875rem 1rem;
     justify-content: space-between;
+    border: 1px solid var(--panel-line);
     color: var(--panel-title);
-    background: #0a0a0f;
+    background: var(--panel);
     font-weight: 650;
     text-decoration: none;
-    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
   }
 
-  :global([data-theme='dark']) a { border: 1px solid var(--panel-line); clip-path: none; }
-
-  a:hover { color: #0a0a0f; background: var(--yellow); }
+  a:hover {
+    border-color: var(--yellow);
+    color: #0a0a0f;
+    background: var(--yellow);
+  }
 
   span::before {
     color: var(--red);

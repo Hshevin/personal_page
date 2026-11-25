@@ -61,25 +61,18 @@ const showCategory = grouped.length > 1;
     grid-template-columns: 3rem minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.875rem;
-    color: var(--panel-ink);
-    background: #0a0a0f;
-    text-decoration: none;
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-    transition: transform 140ms ease;
-  }
-
-  :global([data-theme='dark']) .link-card {
     border: 1px solid var(--panel-line);
+    color: var(--panel-ink);
     background: var(--panel);
-    clip-path: none;
+    text-decoration: none;
+    transition: transform 140ms ease, border-color 140ms ease;
   }
 
   .link-card:hover {
+    border-color: var(--cyan);
     transform: translate(-2px, -2px);
     box-shadow: 4px 4px 0 var(--red);
   }
-
-  :global([data-theme='dark']) .link-card:hover { border-color: var(--cyan); }
 
   .avatar {
     position: relative;

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title description">
-  <title id="title">Hshevin 的字母头像</title>
-  <desc id="description">黑色切角方块上的黄色字母 H，右下角有一道红色斜线</desc>
+  <title id="title">empathless 的字母头像</title>
+  <desc id="description">黑色切角方块上的黄色字母 E，右下角有一道红色斜线</desc>
   <path fill="#0a0a0f" d="M0 0h160v122l-38 38H0z"/>
   <path fill="#ff003c" d="M134 116l12-12v24l-12 12z"/>
-  <path fill="#f3e600" d="M38 34h22v35h40V34h22v92h-22V89H60v37H38z"/>
+  <path fill="#f3e600" d="M42 34h78v20H64v16h44v19H64v17h56v20H42z"/>
 </svg>

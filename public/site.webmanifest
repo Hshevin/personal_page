@@ -1,7 +1,7 @@
 {
-  "name": "Hshevin",
-  "short_name": "Hshevin",
-  "description": "Hshevin 的个人主页与学习记录。",
+  "name": "empathless",
+  "short_name": "empathless",
+  "description": "empathless 的个人主页与学习记录。",
   "lang": "zh-CN",
   "start_url": "/",
   "display": "standalone",

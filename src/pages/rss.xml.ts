@@ -7,7 +7,7 @@ export async function GET(context: { site?: URL }) {
   const posts = getPublishedPosts(await getCollection('posts'));
 
   return rss({
-    title: 'Hshevin 的文章',
+    title: 'empathless 的文章',
     description: '学习记录、项目复盘与偶尔产生的想法。',
     site: context.site ?? 'https://personal-page.example',
     items: posts.map((post) => ({

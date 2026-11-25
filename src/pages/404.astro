@@ -18,20 +18,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <style>
   .not-found {
     display: grid;
-    min-height: 30rem;
-    padding-block: 4rem;
+    min-height: 24rem;
+    padding-block: 2.5rem;
     align-content: center;
   }
 
   h1 {
     margin-block-start: 0.5rem;
+    color: var(--stage-heading);
     font-size: clamp(2.75rem, 9vw, 5rem);
     font-style: italic;
     line-height: 1.05;
-  }
-
-  :global([data-theme='dark']) h1 {
-    color: var(--yellow);
   }
 
   .lede {

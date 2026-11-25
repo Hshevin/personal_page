@@ -86,7 +86,7 @@ import Note from '../../components/Note.astro';
 
 ```yaml
 - id: main
-  name: Hshevin
+  name: empathless
   tagline: 持续学习，也持续记录。
   avatar: /avatar.svg
   location: 城市名称

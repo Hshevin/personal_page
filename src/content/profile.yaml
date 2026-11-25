@@ -1,9 +1,9 @@
 - id: main
-  name: Hshevin
+  name: empathless
   tagline: 持续学习，也持续记录。
   avatar: /avatar.svg
   bio:
-    - 你好，我是 Hshevin。这里用于整理我的生活。
+    - 你好，我是 empathless。这里用于整理我的生活。
   socials:
     - label: GitHub
       url: https://github.com/Hshevin

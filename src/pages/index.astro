@@ -56,7 +56,7 @@ const sectionNumber = (id: string) => `[${pad(sections.indexOf(id) + 1)}]`;
       </div>
     </div>
 
-    <aside class="id-card cut" aria-label="站点概况">
+    <aside class="id-card" aria-label="站点概况">
       <div class="id-photo">
         <img src={profile.data.avatar} alt={`${profile.data.name} 的头像`} width="160" height="160" />
       </div>
@@ -151,7 +151,7 @@ const sectionNumber = (id: string) => `[${pad(sections.indexOf(id) + 1)}]`;
 <style>
   .hero {
     display: grid;
-    padding-block: 4rem 3rem;
+    padding-block: 1.5rem 2.5rem;
     grid-template-columns: minmax(0, 1fr) 15rem;
     align-items: center;
     gap: 3rem;
@@ -159,15 +159,12 @@ const sectionNumber = (id: string) => `[${pad(sections.indexOf(id) + 1)}]`;
 
   h1 {
     margin-block-start: 0.5rem;
-    font-size: clamp(3.5rem, 11vw, 7rem);
+    color: var(--stage-heading);
+    font-size: clamp(2.5rem, 9.5vw, 7rem);
     font-style: italic;
     line-height: 0.95;
     letter-spacing: 0.01em;
     text-transform: uppercase;
-  }
-
-  :global([data-theme='dark']) h1 {
-    color: var(--yellow);
   }
 
   .bio {
@@ -198,18 +195,13 @@ const sectionNumber = (id: string) => `[${pad(sections.indexOf(id) + 1)}]`;
     text-decoration-thickness: 2px;
   }
 
-  .plain-link:hover { color: var(--signal); }
+  .plain-link:hover { color: var(--yellow); }
 
   .id-card {
     padding: 0.875rem;
-    color: var(--yellow);
-    background: #0a0a0f;
-    transform: rotate(1.5deg);
-  }
-
-  :global([data-theme='dark']) .id-card {
     border: 1px solid rgba(243, 230, 0, 0.4);
-    transform: none;
+    color: var(--yellow);
+    background: var(--panel);
   }
 
   .id-photo {
@@ -237,10 +229,12 @@ const sectionNumber = (id: string) => `[${pad(sections.indexOf(id) + 1)}]`;
   .id-name {
     display: flex;
     margin-block-start: 0.75rem;
+    flex-wrap: wrap;
     justify-content: space-between;
+    gap: 0.25rem 0.5rem;
     font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
   }
 
   .id-name span { color: #ff3355; }
@@ -334,12 +328,11 @@ const sectionNumber = (id: string) => `[${pad(sections.indexOf(id) + 1)}]`;
   .friend-list a:hover { color: #0a0a0f; background: var(--yellow); }
 
   @media (max-width: 52rem) {
-    .hero { grid-template-columns: 1fr; gap: 2rem; padding-block: 2.5rem 2rem; }
+    .hero { grid-template-columns: 1fr; gap: 2rem; padding-block: 0.75rem 1.75rem; }
     .id-card {
       display: grid;
       grid-template-columns: 6.5rem minmax(0, 1fr);
       column-gap: 1rem;
-      transform: rotate(0.6deg);
     }
     .id-photo { grid-row: span 3; align-self: start; }
     .id-name { margin-block-start: 0; }
