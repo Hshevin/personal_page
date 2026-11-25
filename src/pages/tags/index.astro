@@ -9,8 +9,8 @@ const posts = getPublishedPosts(await getCollection('posts'));
 const tags = getTagCounts(posts);
 ---
 
-<BaseLayout title="标签" description="按照主题浏览全部学习记录。">
-  <PageHeader eyebrow={`${tags.length} 个标签`} title="标签" description="从一个关键词出发，找到同一条学习路径上的记录。" />
+<BaseLayout title="标签" description="按主题找文章：点选标签查看对应文章。">
+  <PageHeader eyebrow={`共 ${tags.length} 个标签`} title="标签" description="按主题找文章：点选标签查看对应文章。" />
   <ul class="tag-cloud narrow-shell">
     {
       tags.map((tag) => (
@@ -28,7 +28,7 @@ const tags = getTagCounts(posts);
 <style>
   .tag-cloud {
     display: grid;
-    margin-block: 3rem 5rem;
+    margin-block: 0;
     padding: 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
@@ -37,25 +37,33 @@ const tags = getTagCounts(posts);
 
   a {
     display: flex;
-    padding: 1rem;
+    padding: 0.875rem 1rem;
     justify-content: space-between;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--radius-sm);
+    color: var(--panel-title);
+    background: #0a0a0f;
+    font-weight: 650;
     text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
   }
 
-  a:hover {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+  :global([data-theme='dark']) a { border: 1px solid var(--panel-line); clip-path: none; }
+
+  a:hover { color: #0a0a0f; background: var(--yellow); }
+
+  span::before {
+    color: var(--red);
+    font-family: var(--font-mono);
+    content: '# ';
   }
 
   small {
-    color: var(--text-muted);
+    color: var(--cyan);
+    font-family: var(--font-mono);
   }
 
+  a:hover small, a:hover span::before { color: inherit; }
+
   @media (max-width: 36rem) {
-    .tag-cloud {
-      grid-template-columns: 1fr;
-    }
+    .tag-cloud { grid-template-columns: 1fr; }
   }
 </style>

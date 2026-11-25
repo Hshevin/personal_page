@@ -3,28 +3,30 @@ import Icon from './Icon.astro';
 
 const pathname = Astro.url.pathname;
 const navItems = [
-  { href: '/blog', label: '文章' },
-  { href: '/projects', label: '项目' },
-  { href: '/links', label: '链接' },
-  { href: '/about', label: '关于' },
+  { href: '/blog', label: '文章', sections: ['/blog', '/tags', '/archives'] },
+  { href: '/projects', label: '项目', sections: ['/projects'] },
+  { href: '/links', label: '友链', sections: ['/links'] },
+  { href: '/about', label: '关于', sections: ['/about'] },
 ];
 
-const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+const inSection = (section: string) => pathname === section || pathname.startsWith(`${section}/`);
+const isActive = (sections: string[]) => sections.some(inSection);
+const statusPath = decodeURIComponent(pathname).replace(/(.)\/$/, '$1');
 ---
 
 <header class="site-header" data-pagefind-ignore>
   <div class="header-inner">
-    <a class="brand" href="/" aria-label="Hshevin 首页">
+    <a class="brand" href="/" aria-label="Hshevin 首页" aria-current={pathname === '/' ? 'page' : undefined}>
       <span class="brand-mark" aria-hidden="true">H</span>
-      <span>Hshevin</span>
+      <span>HSHEVIN<span class="brand-slash" aria-hidden="true">//</span></span>
     </a>
 
     <nav aria-label="主导航">
       <ul class="nav-list">
         {
-          navItems.map(({ href, label }) => (
+          navItems.map(({ href, label, sections }) => (
             <li>
-              <a href={href} aria-current={isActive(href) ? 'page' : undefined}>
+              <a href={href} aria-current={isActive(sections) ? 'page' : undefined}>
                 {label}
               </a>
             </li>
@@ -34,31 +36,77 @@ const isActive = (href: string) => pathname === href || pathname.startsWith(`${h
     </nav>
 
     <div class="header-actions">
-      <a class="icon-button" href="/search" aria-label="搜索">
+      <a
+        class="icon-button"
+        href="/search"
+        aria-label="搜索（快捷键 /）"
+        title="搜索（按 / 或 ⌘K）"
+        aria-current={inSection('/search') ? 'page' : undefined}
+      >
         <Icon name="search" />
       </a>
-      <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深浅色" aria-pressed="false">
-        <Icon name="moon" />
+      <button class="icon-button theme-toggle" id="theme-toggle" type="button" aria-label="切换深浅色" aria-pressed="false">
+        <span class="theme-icon-dark"><Icon name="moon" /></span>
+        <span class="theme-icon-light"><Icon name="sun" /></span>
       </button>
     </div>
+  </div>
+  <div class="status-bar" aria-hidden="true">
+    <span class="path">~{statusPath}</span>
+    <span class="online">ONLINE</span>
   </div>
 </header>
 
 <script>
+  const root = document.documentElement;
   const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+  const systemDark = matchMedia('(prefers-color-scheme: dark)');
 
-  const syncToggle = () => {
-    const isDark = document.documentElement.dataset.theme === 'dark';
+  const readStoredTheme = () => {
+    try {
+      return localStorage.getItem('theme');
+    } catch {
+      return null;
+    }
+  };
+
+  const applyTheme = (theme: 'light' | 'dark') => {
+    root.dataset.theme = theme;
+    const isDark = theme === 'dark';
     toggle?.setAttribute('aria-pressed', String(isDark));
     toggle?.setAttribute('aria-label', isDark ? '切换到浅色主题' : '切换到深色主题');
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', isDark ? '#07080d' : '#f3e600');
   };
 
   toggle?.addEventListener('click', () => {
-    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    localStorage.setItem('theme', next);
-    syncToggle();
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // 无法持久化时仍切换当前页面
+    }
+    applyTheme(next);
   });
 
-  syncToggle();
+  systemDark.addEventListener('change', (event) => {
+    if (!readStoredTheme()) applyTheme(event.matches ? 'dark' : 'light');
+  });
+
+  applyTheme(root.dataset.theme === 'dark' ? 'dark' : 'light');
+
+  // 全站快捷键：按 / 或 ⌘K / Ctrl+K 打开搜索
+  document.addEventListener('keydown', (event) => {
+    const target = event.target as HTMLElement | null;
+    const typing = target?.closest('input, textarea, select, [contenteditable="true"]');
+    const isSlash = event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey;
+    const isCmdK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
+    if (!(isCmdK || (isSlash && !typing))) return;
+
+    const searchInput = document.querySelector<HTMLInputElement>('#search-input');
+    event.preventDefault();
+    if (searchInput) searchInput.focus();
+    else window.location.href = '/search/';
+  });
 </script>

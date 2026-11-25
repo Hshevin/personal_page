@@ -10,17 +10,17 @@ const posts = getPublishedPosts(await getCollection('posts'));
 const tags = getTagCounts(posts);
 ---
 
-<BaseLayout title="文章" description="学习记录、项目复盘与偶尔产生的想法。">
-  <PageHeader eyebrow={`${posts.length} 篇公开文章`} title="文章" description="学习记录、项目复盘，以及那些值得写下来慢慢理解的东西。" />
+<BaseLayout title="文章" description="学习笔记、项目复盘，还有一些想慢慢弄明白的事。">
+  <PageHeader eyebrow={`共 ${posts.length} 篇`} title="文章" description="学习笔记、项目复盘，还有一些想慢慢弄明白的事。" />
 
   <div class="blog-layout narrow-shell">
-    <section aria-labelledby="all-posts-heading">
+    <section class="panel" aria-labelledby="all-posts-heading">
       <h2 id="all-posts-heading" class="visually-hidden">全部文章</h2>
       <PostList posts={posts} />
     </section>
 
-    <aside aria-labelledby="tag-heading">
-      <h2 id="tag-heading">标签</h2>
+    <aside class="panel panel-red" aria-labelledby="tag-heading">
+      <h2 class="panel-label" id="tag-heading">标签</h2>
       <ul>
         {
           tags.map((tag) => (
@@ -33,7 +33,8 @@ const tags = getTagCounts(posts);
           ))
         }
       </ul>
-      <a class="archive-link" href="/archives">按年份查看归档 →</a>
+      <a class="archive-link mono" href="/tags">&gt; 全部标签</a>
+      <a class="archive-link mono" href="/archives">&gt; 按年份归档</a>
     </aside>
   </div>
 </BaseLayout>
@@ -41,71 +42,47 @@ const tags = getTagCounts(posts);
 <style>
   .blog-layout {
     display: grid;
-    padding-block: 3rem 5rem;
-    grid-template-columns: minmax(0, 1fr) 10rem;
-    gap: 3rem;
+    grid-template-columns: minmax(0, 1fr) 12rem;
+    align-items: start;
+    gap: 1rem;
   }
 
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  aside {
-    padding-block-start: 0.25rem;
-  }
-
-  aside h2 {
-    font-family: inherit;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
+  .blog-layout > section { padding-inline: 0.75rem; }
 
   aside ul {
-    margin: 1rem 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  aside li + li {
-    margin-block-start: 0.5rem;
-  }
+  aside li + li { margin-block-start: 0.35rem; }
 
   aside li a {
     display: flex;
     justify-content: space-between;
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: var(--panel-ink);
+    font-size: 0.875rem;
     text-decoration: none;
   }
 
+  aside li a:hover { color: var(--yellow); }
+
   aside small {
-    color: var(--warm);
+    color: var(--red);
+    font-family: var(--font-mono);
   }
 
   .archive-link {
     display: block;
-    margin-block-start: 1.5rem;
-    color: var(--accent-strong);
+    margin-block-start: 0.5rem;
+    color: var(--cyan);
     font-size: 0.8rem;
     text-decoration: none;
   }
 
-  @media (max-width: 48rem) {
-    .blog-layout {
-      grid-template-columns: 1fr;
-    }
+  .archive-link:hover { color: var(--yellow); }
 
-    aside {
-      padding-block-start: 2rem;
-      border-block-start: 1px solid var(--line-soft);
-    }
+  @media (max-width: 48rem) {
+    .blog-layout { grid-template-columns: 1fr; }
   }
 </style>

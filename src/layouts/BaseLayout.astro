@@ -1,6 +1,8 @@
 ---
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import '@fontsource/rajdhani/latin-600.css';
+import '@fontsource/rajdhani/latin-700.css';
 import '../styles/global.css';
 import 'katex/dist/katex.min.css';
 
@@ -24,11 +26,11 @@ const socialImage = new URL(image, Astro.site);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#fafbfc" />
+    <meta name="theme-color" content="#f3e600" />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href="/favicon-32.png?v=2" sizes="32x32" type="image/png" />
-    <link rel="icon" href="/avatar.svg?v=2" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
+    <link rel="icon" href="/favicon-32.png?v=3" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/avatar.svg?v=3" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="Hshevin 的文章" href="/rss.xml" />
     <meta property="og:type" content={article ? 'article' : 'website'} />
@@ -41,16 +43,23 @@ const socialImage = new URL(image, Astro.site);
     <title>{fullTitle}</title>
     <script is:inline>
       (() => {
-        const stored = localStorage.getItem('theme');
+        let stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch {}
         const systemDark = matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.dataset.theme = stored ?? (systemDark ? 'dark' : 'light');
+        const theme = stored ?? (systemDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute('content', theme === 'dark' ? '#07080d' : '#f3e600');
       })();
     </script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
     <Header />
-    <main id="main-content" data-pagefind-body>
+    <main id="main-content">
       <slot />
     </main>
     <Footer />

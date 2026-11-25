@@ -7,17 +7,19 @@ import { estimateReadingMinutes, getPublishedPosts } from '../../lib/content';
 export async function getStaticPaths() {
   const posts = getPublishedPosts(await getCollection('posts'));
 
-  return posts.map((post) => ({
+  return posts.map((post, index) => ({
     params: { slug: post.id },
-    props: { post },
+    props: { post, newer: posts[index - 1], older: posts[index + 1] },
   }));
 }
 
 interface Props {
   post: CollectionEntry<'posts'>;
+  newer?: CollectionEntry<'posts'>;
+  older?: CollectionEntry<'posts'>;
 }
 
-const { post } = Astro.props;
+const { post, newer, older } = Astro.props;
 const { Content, headings } = await render(post);
 const toc = headings.filter(({ depth }) => depth === 2 || depth === 3);
 const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
@@ -31,21 +33,28 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
   image={post.data.cover}
   article
 >
-  <article class="article-shell">
+  <article class="article-shell" data-pagefind-body>
     <header class="article-header">
-      <a class="back-link" href="/blog">← 返回文章列表</a>
+      <a class="back-link mono" href="/blog">&lt; 全部文章</a>
       <h1 data-pagefind-meta="title">{post.data.title}</h1>
-      <p>{post.data.description}</p>
-      <div class="article-meta">
+      <p class="article-lede">{post.data.description}</p>
+      <div class="article-meta mono">
         <time datetime={post.data.publishedAt.toISOString()}>
           {dateFormatter.format(post.data.publishedAt)}
         </time>
-        <span>{estimateReadingMinutes(post.body ?? '')} 分钟阅读</span>
+        {
+          post.data.updatedAt && (
+            <span>
+              更新于 <time datetime={post.data.updatedAt.toISOString()}>{dateFormatter.format(post.data.updatedAt)}</time>
+            </span>
+          )
+        }
+        <span>约 {estimateReadingMinutes(post.body ?? '')} 分钟读完</span>
       </div>
       <ul class="tag-row" aria-label="文章标签">
         {
           post.data.tags.map((tag) => (
-            <li><a href={`/tags/${encodeURIComponent(tag)}/`}>#{tag}</a></li>
+            <li><a class="mono" href={`/tags/${encodeURIComponent(tag)}/`}>#{tag}</a></li>
           ))
         }
       </ul>
@@ -54,63 +63,145 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
     <div class="article-grid">
       {
         toc.length > 0 && (
-          <aside aria-labelledby="toc-heading">
-            <h2 id="toc-heading">目录</h2>
-            <ol>
-              {toc.map((heading) => (
-                <li class:list={{ nested: heading.depth === 3 }}>
-                  <a href={`#${heading.slug}`}>{heading.text}</a>
-                </li>
-              ))}
-            </ol>
+          <aside class="toc panel" data-pagefind-ignore>
+            <details>
+              <summary class="panel-label" id="toc-heading">目录</summary>
+              <ol aria-labelledby="toc-heading">
+                {toc.map((heading) => (
+                  <li class:list={{ nested: heading.depth === 3 }}>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </details>
           </aside>
         )
       }
-      <div class="prose">
+      <div class="prose cut-br">
         <Content />
       </div>
     </div>
+
+    <nav class="article-end" aria-label="继续阅读" data-pagefind-ignore>
+      {
+        (newer || older) && (
+          <div class="sibling-posts">
+            {older ? (
+              <a href={`/blog/${older.id}/`} rel="prev">
+                <small>上一篇</small>
+                <span>{older.data.title}</span>
+              </a>
+            ) : <span />}
+            {newer && (
+              <a class="newer" href={`/blog/${newer.id}/`} rel="next">
+                <small>下一篇</small>
+                <span>{newer.data.title}</span>
+              </a>
+            )}
+          </div>
+        )
+      }
+      <div class="end-links mono">
+        <a href="/blog">&lt; 全部文章</a>
+        <a href="#top">回到顶部 ^</a>
+      </div>
+    </nav>
   </article>
+
+  <script>
+    // 窄屏默认收起目录；宽屏高亮当前阅读的小节
+    const details = document.querySelector<HTMLDetailsElement>('.toc details');
+    const wide = matchMedia('(min-width: 56.01rem)');
+    const syncOpen = () => {
+      if (details) details.open = wide.matches;
+    };
+    syncOpen();
+    wide.addEventListener('change', syncOpen);
+
+    const links = new Map(
+      [...document.querySelectorAll<HTMLAnchorElement>('.toc a')].map((link) => [
+        decodeURIComponent(link.hash.slice(1)),
+        link,
+      ]),
+    );
+    const headings = [...links.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((heading): heading is HTMLElement => heading !== null);
+
+    if (headings.length > 0) {
+      const setActive = () => {
+        const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
+        const current = atBottom
+          ? headings[headings.length - 1]
+          : (headings.findLast((heading) => heading.getBoundingClientRect().top < 120) ?? headings[0]);
+        for (const [id, link] of links) {
+          if (id === current.id) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        }
+      };
+      let pending = false;
+      addEventListener(
+        'scroll',
+        () => {
+          if (pending) return;
+          pending = true;
+          requestAnimationFrame(() => {
+            pending = false;
+            setActive();
+          });
+        },
+        { passive: true },
+      );
+      setActive();
+    }
+  </script>
 </BaseLayout>
 
 <style>
   .article-shell {
-    width: min(calc(100% - 2rem), 64rem);
+    width: min(calc(100% - 2rem), 66rem);
     margin-inline: auto;
   }
 
   .article-header {
     width: min(100%, var(--content-width));
     margin-inline: auto;
-    padding-block: 4.5rem 3rem;
-    border-block-end: 1px solid var(--line);
+    padding-block: 3rem 2.25rem;
   }
 
   .back-link {
     display: inline-block;
-    margin-block-end: 1.5rem;
-    color: var(--text-muted);
-    font-size: 0.825rem;
+    margin-block-end: 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
     text-decoration: none;
   }
 
+  .back-link:hover { color: var(--signal); }
+
   h1 {
-    font-size: clamp(2.35rem, 6vw, 4rem);
-    letter-spacing: -0.045em;
+    font-size: clamp(2.25rem, 6vw, 3.75rem);
+    line-height: 1.15;
   }
 
-  .article-header > p {
-    margin-block-start: 1rem;
-    color: var(--text-muted);
-    font-size: 1.05rem;
+  :global([data-theme='dark']) h1 {
+    color: var(--yellow);
+    text-shadow: -2px 0 #ff003c, 2px 0 var(--cyan);
+  }
+
+  .article-lede {
+    margin-block-start: 0.875rem;
+    font-size: 1.1rem;
+    font-weight: 500;
   }
 
   .article-meta {
     display: flex;
-    margin-block-start: 1.5rem;
-    gap: 1rem;
-    color: var(--text-muted);
-    font-size: 0.825rem;
+    margin-block-start: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
   }
 
   .tag-row {
@@ -118,72 +209,111 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
     margin: 0.75rem 0 0;
     padding: 0;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.5rem;
     list-style: none;
   }
 
   .tag-row a {
-    color: var(--accent-strong);
-    font-size: 0.8rem;
+    display: inline-block;
+    padding: 0 0.5rem;
+    color: var(--yellow);
+    background: #0a0a0f;
+    font-size: 0.75rem;
+    font-weight: 700;
     text-decoration: none;
   }
 
+  .tag-row a:hover { color: #0a0a0f; background: var(--cyan); }
+
   .article-grid {
     display: grid;
-    padding-block: 3rem 5rem;
-    grid-template-columns: 10rem minmax(0, var(--content-width));
+    grid-template-columns: 12rem minmax(0, var(--content-width));
     justify-content: center;
-    gap: 3rem;
+    align-items: start;
+    gap: 1.5rem;
   }
 
-  aside {
+  .article-grid:not(:has(.toc)) {
+    grid-template-columns: minmax(0, var(--content-width));
+  }
+
+  .toc {
     position: sticky;
-    top: 2rem;
-    height: max-content;
-    padding-block-start: 0.4rem;
+    top: 1.5rem;
+    padding: 1rem 1rem 1rem 1.25rem;
   }
 
-  aside h2 {
-    font-family: inherit;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .toc summary {
+    margin: 0;
+    cursor: pointer;
+    list-style: none;
   }
 
-  aside ol {
+  .toc summary::-webkit-details-marker { display: none; }
+  .toc summary::after { content: '[+]'; }
+  .toc details[open] summary::after { content: '[-]'; }
+
+  .toc ol {
     margin: 0.75rem 0 0;
     padding: 0;
     list-style: none;
   }
 
-  aside li + li {
-    margin-block-start: 0.4rem;
-  }
+  .toc li + li { margin-block-start: 0.35rem; }
+  .toc li.nested { padding-inline-start: 0.75rem; }
 
-  aside li.nested {
-    padding-inline-start: 0.75rem;
-  }
-
-  aside a {
-    color: var(--text-muted);
-    font-size: 0.75rem;
+  .toc a {
+    display: block;
+    padding-inline-start: 0.5rem;
+    border-inline-start: 2px solid transparent;
+    color: var(--panel-muted);
+    font-size: 0.8rem;
     line-height: 1.45;
     text-decoration: none;
   }
 
+  .toc a:hover { color: var(--panel-title); }
+
+  .toc a[aria-current='location'] {
+    border-inline-start-color: var(--yellow);
+    color: var(--panel-title);
+  }
+
   .prose {
     min-width: 0;
+    padding: 2rem 2.25rem 2.5rem;
+    color: var(--read-ink);
+    background: var(--read-bg);
     font-size: 1.025rem;
+    line-height: 1.85;
   }
+
+  :global([data-theme='dark']) .prose {
+    border: 1px solid var(--read-line);
+    clip-path: none;
+  }
+
+  .prose > :global(:first-child) { margin-block-start: 0; }
+  .prose > :global(:last-child) { margin-block-end: 0; }
 
   .prose :global(h2),
   .prose :global(h3) {
-    scroll-margin-top: 2rem;
+    color: var(--read-strong);
+    scroll-margin-top: 1.5rem;
   }
 
   .prose :global(h2) {
-    margin-block: 3rem 1rem;
-    font-size: 1.75rem;
+    margin-block: 2.5rem 1rem;
+    padding-block-end: 0.35rem;
+    border-block-end: 2px solid var(--read-line);
+    font-size: 1.65rem;
+  }
+
+  .prose :global(h2)::before {
+    color: var(--read-accent);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    content: '# ';
   }
 
   .prose :global(h3) {
@@ -202,44 +332,100 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
   .prose :global(img) {
     height: auto;
     margin-block: 2rem;
-    border-radius: var(--radius-sm);
   }
 
   .prose :global(pre) {
     padding: 1rem;
     overflow-x: auto;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--radius-sm);
+    border-inline-start: 3px solid var(--cyan);
+    background: #0a0a0f !important;
+    color: #e6f4f9;
     font-size: 0.875rem;
   }
 
   .prose :global(:not(pre) > code) {
-    padding: 0.125rem 0.35rem;
-    border-radius: 0.25rem;
-    background: var(--surface-raised);
+    padding: 0.1rem 0.35rem;
+    background: var(--read-code);
     font-size: 0.9em;
   }
 
   .prose :global(blockquote) {
     margin-inline: 0;
     padding-inline-start: 1rem;
-    border-inline-start: 2px solid var(--accent);
-    color: var(--text-muted);
+    border-inline-start: 3px solid var(--read-accent);
+    color: var(--read-muted);
   }
 
   .prose :global(a) {
-    color: var(--accent-strong);
+    color: var(--read-accent);
+    text-decoration-thickness: 1px;
   }
 
-  @media (max-width: 56rem) {
-    .article-grid {
-      grid-template-columns: minmax(0, var(--content-width));
-    }
+  .prose :global(hr) {
+    height: 0.5rem;
+    margin-block: 2.5rem;
+    border: 0;
+    background: repeating-linear-gradient(-45deg, var(--read-line) 0 0.5rem, transparent 0.5rem 1rem);
+  }
 
-    aside {
-      position: static;
-      padding-block-end: 1.5rem;
-      border-block-end: 1px solid var(--line-soft);
-    }
+  .article-end {
+    width: min(100%, var(--content-width));
+    margin: 1.5rem auto 0;
+  }
+
+  .article-grid:has(.toc) + .article-end {
+    width: min(100%, calc(var(--content-width) + 13.5rem));
+    padding-inline-start: 13.5rem;
+  }
+
+  .sibling-posts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .sibling-posts a {
+    display: grid;
+    padding: 0.875rem 1rem;
+    gap: 0.15rem;
+    color: var(--panel-title);
+    background: #0a0a0f;
+    text-decoration: none;
+  }
+
+  :global([data-theme='dark']) .sibling-posts a { border: 1px solid var(--panel-line); }
+
+  .sibling-posts a:hover { color: #0a0a0f; background: var(--cyan); }
+  .sibling-posts .newer { text-align: end; }
+
+  .sibling-posts small {
+    color: var(--cyan);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+  }
+
+  .sibling-posts a:hover small { color: inherit; }
+
+  .end-links {
+    display: flex;
+    margin-block-start: 1rem;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .end-links a { text-decoration: none; }
+  .end-links a:hover { color: var(--signal); }
+
+  @media (max-width: 56rem) {
+    .article-grid { grid-template-columns: minmax(0, var(--content-width)); }
+    .toc { position: relative; top: 0; }
+    .article-grid:has(.toc) + .article-end { width: min(100%, var(--content-width)); padding-inline-start: 0; }
+  }
+
+  @media (max-width: 36rem) {
+    .prose { padding: 1.5rem 1.15rem 2rem; }
+    .sibling-posts { grid-template-columns: 1fr; }
   }
 </style>

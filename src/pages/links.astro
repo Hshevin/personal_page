@@ -8,24 +8,28 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const links = (await getCollection('links')).toSorted(
   (left, right) => right.data.order - left.data.order,
 );
-const grouped = Map.groupBy(links, ({ data }) => data.category);
+const grouped = [...Map.groupBy(links, ({ data }) => data.category)];
+const showCategory = grouped.length > 1;
 ---
 
-<BaseLayout title="链接" description="朋友们的站点，以及值得常常回访的地方。">
-  <PageHeader eyebrow={`${links.length} 个站点`} title="链接" description="朋友们的站点，以及那些让我获得启发、值得常常回访的地方。" />
+<BaseLayout title="友链" description="朋友们的小站，常来串门。">
+  <PageHeader eyebrow={`共 ${links.length} 个站点`} title="友链" description="朋友们的小站，常来串门。" />
   <div class="link-groups narrow-shell">
     {
-      [...grouped].map(([category, entries]) => (
-        <section aria-labelledby={`category-${category}`}>
-          <h2 id={`category-${category}`}>{category}</h2>
+      grouped.map(([category, entries], groupIndex) => (
+        <section aria-label={showCategory ? undefined : category} aria-labelledby={showCategory ? `category-${groupIndex}` : undefined}>
+          {showCategory && <h2 class="kicker" id={`category-${groupIndex}`}>// {category}</h2>}
           <div class="link-grid">
             {entries.map((entry) => (
-              <a href={entry.data.url} target="_blank" rel="noopener noreferrer">
-                <img src={entry.data.avatar} alt="" width="48" height="48" loading="lazy" />
-                <div>
-                  <h3>{entry.data.name}</h3>
-                  <p>{entry.data.description}</p>
-                </div>
+              <a class="link-card" href={entry.data.url} target="_blank" rel="noopener noreferrer">
+                <span class="avatar" aria-hidden="true">
+                  <span>{entry.data.name.slice(0, 1)}</span>
+                  <img src={entry.data.avatar} alt="" width="48" height="48" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()" />
+                </span>
+                <span class="copy">
+                  <strong>{entry.data.name}</strong>
+                  <span>{entry.data.description}</span>
+                </span>
                 <Icon name="external" size={15} />
               </a>
             ))}
@@ -37,20 +41,12 @@ const grouped = Map.groupBy(links, ({ data }) => data.category);
 </BaseLayout>
 
 <style>
-  .link-groups {
-    padding-block: 3rem 5rem;
-  }
-
   section + section {
-    margin-block-start: 3rem;
+    margin-block-start: 2.5rem;
   }
 
   section > h2 {
-    margin-block-end: 1rem;
-    font-family: inherit;
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    margin-block-end: 0.75rem;
   }
 
   .link-grid {
@@ -59,44 +55,74 @@ const grouped = Map.groupBy(links, ({ data }) => data.category);
     gap: 0.75rem;
   }
 
-  .link-grid a {
+  .link-card {
     display: grid;
     padding: 1rem;
     grid-template-columns: 3rem minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.875rem;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--radius-sm);
+    color: var(--panel-ink);
+    background: #0a0a0f;
     text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+    transition: transform 140ms ease;
   }
 
-  .link-grid a:hover {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+  :global([data-theme='dark']) .link-card {
+    border: 1px solid var(--panel-line);
+    background: var(--panel);
+    clip-path: none;
   }
 
-  img {
+  .link-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--red);
+  }
+
+  :global([data-theme='dark']) .link-card:hover { border-color: var(--cyan); }
+
+  .avatar {
+    position: relative;
+    display: grid;
     width: 3rem;
     height: 3rem;
-    border-radius: 50%;
-    background: var(--paper-soft);
+    place-items: center;
+    color: #0a0a0f;
+    background: var(--yellow);
+    font-weight: 800;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%);
+  }
+
+  .avatar img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
   }
 
-  h3 {
-    font-family: inherit;
+  .copy {
+    display: grid;
+    min-width: 0;
+    gap: 0.15rem;
+  }
+
+  strong {
+    color: var(--panel-title);
     font-size: 0.95rem;
   }
 
-  p {
-    margin-block-start: 0.2rem;
+  .copy > span {
+    display: -webkit-box;
     overflow: hidden;
-    color: var(--text-muted);
-    font-size: 0.78rem;
+    color: var(--panel-muted);
+    font-size: 0.8rem;
     line-height: 1.45;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
+
+  .link-card > :global(svg) { color: var(--cyan); }
 
   @media (max-width: 42rem) {
     .link-grid {
