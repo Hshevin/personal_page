@@ -8,14 +8,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const [profile] = await getCollection('profile');
 ---
 
-<BaseLayout title="关于" description={`关于 ${profile.data.name} 与这个站点。`}>
-  <PageHeader eyebrow="About" title="关于" description={profile.data.tagline} />
+<BaseLayout title="关于" description={`关于 ${profile.data.name}，以及这个站点是怎么搭起来的。`}>
+  <PageHeader eyebrow="档案" title="关于" description={profile.data.tagline} />
 
-  <div class="about narrow-shell">
-    <section class="intro" aria-labelledby="about-me-heading">
-      <img src={profile.data.avatar} alt={`${profile.data.name} 的头像`} width="96" height="96" />
+  <div class="about narrow-shell" data-pagefind-body>
+    <section class="intro panel" aria-labelledby="about-me-heading">
+      <img class="cut" src={profile.data.avatar} alt={`${profile.data.name} 的头像`} width="96" height="96" />
       <div>
-        <h2 id="about-me-heading">你好，我是 {profile.data.name}</h2>
+        <h2 id="about-me-heading">{profile.data.name}</h2>
         {profile.data.bio.map((paragraph) => <p>{paragraph}</p>)}
         <ul class="socials" aria-label="社交链接">
           {
@@ -33,8 +33,8 @@ const [profile] = await getCollection('profile');
 
     {
       profile.data.education.length > 0 && (
-        <section aria-labelledby="education-heading">
-          <h2 id="education-heading">教育经历</h2>
+        <section class="panel panel-yellow" aria-labelledby="education-heading">
+          <h2 class="panel-label" id="education-heading">教育经历</h2>
           <ol class="timeline">
             {profile.data.education.map((item) => (
               <li>
@@ -50,14 +50,14 @@ const [profile] = await getCollection('profile');
       )
     }
 
-    <section aria-labelledby="skills-heading">
-      <h2 id="skills-heading">技能与工具</h2>
+    <section class="panel panel-red" aria-labelledby="skills-heading">
+      <h2 class="panel-label" id="skills-heading">在学在用</h2>
       <div class="skill-groups">
         {
           profile.data.skills.map((group) => (
             <section>
               <h3>{group.category}</h3>
-              <ul>
+              <ul class="chip-list">
                 {group.items.map((item) => <li>{item}</li>)}
               </ul>
             </section>
@@ -66,11 +66,10 @@ const [profile] = await getCollection('profile');
       </div>
     </section>
 
-    <section aria-labelledby="site-heading">
-      <h2 id="site-heading">关于这个站点</h2>
+    <section class="panel" aria-labelledby="site-heading">
+      <h2 class="panel-label" id="site-heading">关于这个站点</h2>
       <div class="site-copy">
-        <p>本站以 Astro 构建，内容保存在 Markdown、MDX 与 YAML 文件中，并通过 Git 记录每一次修改。</p>
-        <p>站点静态生成后部署到 Cloudflare Workers，不需要数据库或管理后台。搜索索引同样在构建阶段生成。</p>
+        <p>这是一个轻量的静态网站：文章和资料都以纯文本保存，每次修改都有记录，没有后台，也不收集访客信息。</p>
       </div>
     </section>
   </div>
@@ -78,41 +77,35 @@ const [profile] = await getCollection('profile');
 
 <style>
   .about {
-    padding-block: 3rem 5rem;
-  }
-
-  .about > section {
-    padding-block: 2.5rem;
-  }
-
-  .about > section + section {
-    border-block-start: 1px solid var(--line-soft);
+    display: grid;
+    gap: 1rem;
   }
 
   .intro {
     display: grid;
-    padding-block-start: 0 !important;
     grid-template-columns: 6rem minmax(0, 1fr);
     gap: 1.5rem;
   }
 
   .intro img {
-    border: 1px solid var(--line);
-    border-radius: 50%;
+    width: 6rem;
+    height: 6rem;
+    object-fit: cover;
+    background: var(--yellow);
   }
 
-  .about > section > h2,
   .intro h2 {
-    font-size: 1.55rem;
+    color: var(--panel-title);
+    font-size: 1.6rem;
   }
 
   .intro p,
   .site-copy p {
-    margin-block-start: 0.75rem;
+    margin-block-start: 0.6rem;
+    color: var(--panel-ink);
   }
 
-  .socials,
-  .skill-groups ul {
+  .socials {
     display: flex;
     margin: 1rem 0 0;
     padding: 0;
@@ -125,41 +118,66 @@ const [profile] = await getCollection('profile');
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    color: var(--accent-strong);
+    color: var(--cyan);
+    font-family: var(--font-mono);
     font-size: 0.85rem;
-    font-weight: 650;
+    font-weight: 700;
     text-decoration: none;
   }
 
+  .socials a:hover { color: var(--yellow); }
+
+  .timeline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .timeline li {
+    display: grid;
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .timeline li + li { margin-block-start: 1rem; }
+
+  .timeline span {
+    color: var(--cyan);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .timeline h3 {
+    color: var(--panel-title);
+    font-family: inherit;
+    font-size: 1rem;
+  }
+
+  .timeline p { color: var(--panel-muted); }
+
   .skill-groups {
     display: grid;
-    margin-block-start: 1.5rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
   .skill-groups h3 {
+    margin-block-end: 0.5rem;
+    color: var(--panel-title);
     font-family: inherit;
     font-size: 0.9rem;
   }
 
-  .skill-groups li {
-    padding: 0.125rem 0.5rem;
-    border: 1px solid var(--line-soft);
-    border-radius: 999px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-  }
-
-  .site-copy {
-    margin-block-start: 1rem;
-  }
+  .site-copy p:first-child { margin-block-start: 0; }
 
   @media (max-width: 40rem) {
     .intro,
-    .skill-groups {
+    .skill-groups,
+    .timeline li {
       grid-template-columns: 1fr;
     }
+
+    .timeline li { gap: 0.25rem; }
 
     .intro img {
       width: 4.5rem;

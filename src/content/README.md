@@ -118,7 +118,7 @@ import Note from '../../components/Note.astro';
 | --- | --- | --- |
 | `id` | 是 | 固定使用 `main` |
 | `name` | 是 | 页面显示名称 |
-| `tagline` | 是 | 首页的一句话介绍 |
+| `tagline` | 是 | 一句话介绍，显示在首页大标题上方和关于页 |
 | `avatar` | 是 | 站内绝对路径或完整图片 URL |
 | `location` | 否 | 公开展示的位置；不建议填写精确住址 |
 | `bio` | 是 | 至少包含一个非空段落 |
@@ -133,7 +133,9 @@ import Note from '../../components/Note.astro';
 avatar: /images/avatar.webp
 ```
 
-首页会从图片中心裁切为圆形；建议使用正方形或主体居中的图片。替换图片后无需修改页面组件。
+这张图会显示在首页右侧的“身份卡”大图位置和关于页，按正方形从中心裁切；建议使用 600×600 以上的正方形图片，主体放在中间。替换后无需修改页面组件。
+
+浏览器标签图标和分享卡片仍使用 `public/avatar.svg`、`public/favicon-32.png`、`public/apple-touch-icon.png`，不会随 `avatar` 改变；想一起换就直接替换这三个文件。
 
 ## 项目：`projects.yaml`
 

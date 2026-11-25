@@ -3,16 +3,16 @@ import PageHeader from '../components/PageHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="搜索" description="搜索站内文章和页面。">
+<BaseLayout title="搜索" description="在文章、项目和关于页里找内容。">
   <div data-pagefind-ignore>
-    <PageHeader eyebrow="Search" title="搜索" description="输入关键词，查找文章标题、标签与正文内容。" />
-    <section class="search-shell narrow-shell" aria-labelledby="search-label">
-      <label id="search-label" for="search-input">关键词</label>
+    <PageHeader eyebrow="检索" title="搜索" description="在文章和页面里找内容。用电脑访问时，任何页面按 / 或 ⌘K 都能直接打开。" />
+    <section class="search-shell panel narrow-shell" aria-labelledby="search-label">
+      <label class="panel-label" id="search-label" for="search-input">关键词</label>
       <div class="search-field">
-        <input id="search-input" type="search" autocomplete="off" placeholder="例如：Astro、Markdown、学习……" />
-        <kbd>⌘ K</kbd>
+        <input id="search-input" type="search" autocomplete="off" placeholder="输入标题、标签或关键词" />
+        <kbd aria-hidden="true">/</kbd>
       </div>
-      <p class="search-status" id="search-status" role="status" aria-live="polite">输入关键词开始搜索。</p>
+      <p class="search-status" id="search-status" role="status" aria-live="polite">输入关键词，结果会马上出现。</p>
       <ol class="search-results" id="search-results"></ol>
     </section>
   </div>
@@ -37,7 +37,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       await pagefind.init();
       return pagefind;
     } catch {
-      setStatus('搜索索引仅在生产构建后可用，请先运行 npm run build。');
+      setStatus('搜索暂时不可用，请稍后再试。');
       return undefined;
     }
   };
@@ -47,7 +47,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     results.replaceChildren();
 
     if (!term.trim()) {
-      setStatus('输入关键词开始搜索。');
+      setStatus('输入关键词，结果会马上出现。');
       return;
     }
 
@@ -56,8 +56,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const response = await search?.debouncedSearch(term.trim());
     if (!response) return;
 
+    const total = response.results.length;
     const entries = await Promise.all(response.results.slice(0, 12).map((result) => result.data()));
-    setStatus(entries.length > 0 ? `找到 ${entries.length} 条结果。` : '没有找到相关内容。');
+    setStatus(
+      total === 0
+        ? '没有找到相关内容，换个关键词试试。'
+        : total > entries.length
+          ? `找到 ${total} 条结果，先显示最相关的 ${entries.length} 条。`
+          : `找到 ${total} 条结果。`,
+    );
 
     for (const entry of entries) {
       const item = document.createElement('li');
@@ -83,99 +90,109 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     void renderResults(term);
   });
 
-  document.addEventListener('keydown', (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-      event.preventDefault();
-      input?.focus();
-    }
-  });
-
   const initialQuery = new URL(window.location.href).searchParams.get('q');
   if (initialQuery && input) {
     input.value = initialQuery;
     void renderResults(initialQuery);
   }
+  input?.focus();
 </script>
 
 <style>
-  .search-shell {
-    padding-block: 3rem 5rem;
-  }
-
-  label {
-    display: block;
-    margin-block-end: 0.5rem;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 650;
-  }
-
   .search-field {
     position: relative;
+  }
+
+  .search-field::before {
+    position: absolute;
+    top: 50%;
+    left: 0.9rem;
+    transform: translateY(-50%);
+    color: var(--yellow);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    content: '>';
+    pointer-events: none;
   }
 
   input {
     width: 100%;
     min-height: 3.25rem;
-    padding: 0.75rem 4rem 0.75rem 1rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    color: var(--text-strong);
-    background: var(--surface);
+    padding: 0.75rem 3.5rem 0.75rem 2.1rem;
+    border: 1px solid var(--panel-line);
+    border-radius: 0;
+    color: var(--panel-title);
+    background: var(--panel-raised);
     font: inherit;
+    font-family: var(--font-mono);
   }
 
   input::placeholder {
-    color: var(--text-muted);
+    color: var(--panel-muted);
   }
 
   input:focus {
-    border-color: var(--accent);
+    border-color: var(--yellow);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--yellow);
   }
 
   kbd {
     position: absolute;
     top: 50%;
     right: 0.875rem;
-    padding: 0.1rem 0.4rem;
+    padding: 0 0.45rem;
     transform: translateY(-50%);
-    border: 1px solid var(--line-soft);
-    border-radius: 0.25rem;
-    color: var(--text-muted);
-    font-size: 0.7rem;
+    border: 1px solid var(--panel-line);
+    color: var(--panel-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  @media (hover: none) {
+    kbd {
+      display: none;
+    }
   }
 
   .search-status {
     margin-block: 1rem;
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: var(--cyan);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
   }
 
   .search-results {
     margin: 0;
     padding: 0;
-    border-block-start: 1px solid var(--line);
     list-style: none;
   }
 
-  .search-results :global(li) {
-    border-block-end: 1px solid var(--line-soft);
+  .search-results :global(li + li) {
+    border-block-start: 1px dashed var(--panel-line);
   }
 
   .search-results :global(a) {
     display: block;
-    padding-block: 1.25rem;
+    padding: 0.875rem 0.75rem;
+    border-inline-start: 2px solid transparent;
     text-decoration: none;
   }
 
+  .search-results :global(a:hover) {
+    border-inline-start-color: var(--yellow);
+    background: var(--panel-raised);
+  }
+
   .search-results :global(h2) {
+    color: var(--panel-title);
     font-family: inherit;
     font-size: 1.05rem;
   }
 
   .search-results :global(p) {
-    margin-block-start: 0.4rem;
-    color: var(--text-muted);
+    margin-block-start: 0.3rem;
+    color: var(--panel-muted);
     font-size: 0.875rem;
   }
 </style>

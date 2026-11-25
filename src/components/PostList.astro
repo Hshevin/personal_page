@@ -36,15 +36,15 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
                 </span>
               )}
             </div>
-            <span class="post-arrow" aria-hidden="true">→</span>
+            <span class="post-arrow" aria-hidden="true">&gt;</span>
           </a>
         </li>
       ))}
     </ol>
   ) : (
     <div class="empty-state" role="status">
-      <p>这里还没有公开内容。</p>
-      <span>新的记录正在路上。</span>
+      <strong>// 暂无公开文章</strong>
+      <span>第一篇还在写，过几天再来看看。</span>
     </div>
   )
 }

@@ -25,23 +25,23 @@ const { posts, tag } = Astro.props;
 ---
 
 <BaseLayout title={`标签：${tag}`} description={`浏览所有带有 ${tag} 标签的文章。`}>
-  <PageHeader eyebrow="Tag" title={`# ${tag}`} description={`共 ${posts.length} 篇记录。`} />
-  <section class="tag-posts narrow-shell" aria-label={`${tag} 标签文章`}>
+  <PageHeader eyebrow="标签" title={`# ${tag}`} description={`这个标签下共有 ${posts.length} 篇文章。`} />
+  <section class="tag-posts panel narrow-shell" aria-label={`${tag} 标签文章`}>
     <PostList posts={posts} />
-    <a href="/tags">← 返回全部标签</a>
+    <a class="back mono" href="/tags">&lt; 全部标签</a>
   </section>
 </BaseLayout>
 
 <style>
-  .tag-posts {
-    padding-block: 3rem 5rem;
-  }
+  .tag-posts { padding-inline: 0.75rem; }
 
-  .tag-posts > a {
+  .back {
     display: inline-block;
-    margin-block-start: 2rem;
-    color: var(--accent-strong);
-    font-size: 0.875rem;
+    margin: 1rem 0 0 0.75rem;
+    color: var(--cyan);
+    font-size: 0.8rem;
     text-decoration: none;
   }
+
+  .back:hover { color: var(--yellow); }
 </style>

@@ -8,36 +8,50 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const projects = (await getCollection('projects')).toSorted(
   (left, right) => right.data.order - left.data.order,
 );
+const [profile] = await getCollection('profile');
+const github = profile.data.socials.find(({ label }) => label === 'GitHub');
 ---
 
-<BaseLayout title="项目" description="正在构建和持续维护的项目。">
-  <PageHeader eyebrow={`${projects.length} 个项目`} title="项目" description="把想法做成能够运行、能够使用，也能够继续迭代的东西。" />
-  <div class="projects narrow-shell">
+<BaseLayout title="项目" description="做过和正在做的小东西。">
+  <PageHeader
+    eyebrow={projects.length > 0 ? `共 ${projects.length} 个` : '建设中'}
+    title="项目"
+    description="把想法做成能跑、能用、还能接着改的东西。"
+  />
+  <div class="projects narrow-shell" data-pagefind-body={projects.length > 0 ? '' : undefined}>
     {
-      projects.map((project, index) => (
-        <article>
-          <header>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            {project.data.featured && <small>Featured</small>}
-          </header>
-          <h2>{project.data.title}</h2>
-          <p>{project.data.summary}</p>
-          <ul class="stack" aria-label={`${project.data.title} 技术栈`}>
-            {project.data.stack.map((item) => <li>{item}</li>)}
-          </ul>
-          {project.data.links.length > 0 && (
-            <ul class="project-links" aria-label={`${project.data.title} 相关链接`}>
-              {project.data.links.map((link) => (
-                <li>
-                  <a href={link.url} target="_blank" rel="noopener noreferrer">
-                    {link.label} <Icon name="external" size={15} />
-                  </a>
-                </li>
-              ))}
+      projects.length > 0 ? (
+        projects.map((project, index) => (
+          <article class:list={['panel', { 'panel-yellow': project.data.featured }]}>
+            <p class="panel-label">
+              <span>[{String(index + 1).padStart(2, '0')}]</span>
+              {project.data.featured && <span class="featured">精选</span>}
+            </p>
+            <h2>{project.data.title}</h2>
+            <p class="summary">{project.data.summary}</p>
+            <ul class="chip-list" aria-label={`${project.data.title} 技术栈`}>
+              {project.data.stack.map((item) => <li>{item}</li>)}
             </ul>
-          )}
-        </article>
-      ))
+            {project.data.links.length > 0 && (
+              <ul class="project-links" aria-label={`${project.data.title} 相关链接`}>
+                {project.data.links.map((link) => (
+                  <li>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer">
+                      {link.label} <Icon name="external" size={14} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+        ))
+      ) : (
+        <div class="panel empty" role="status">
+          <p class="panel-label">// 暂无项目</p>
+          <p>项目还在整理中，准备好就放上来。</p>
+          <p>先去看看<a href="/blog">文章</a>{github && <>，或者到 <a href={github.url} target="_blank" rel="noopener noreferrer">GitHub</a> 翻翻代码</>}。</p>
+        </div>
+      )
     }
   </div>
 </BaseLayout>
@@ -45,73 +59,50 @@ const projects = (await getCollection('projects')).toSorted(
 <style>
   .projects {
     display: grid;
-    padding-block: 3rem 5rem;
     gap: 1rem;
   }
 
-  article {
-    padding: 1.5rem;
-    border: 1px solid var(--line-soft);
-    border-radius: var(--radius-md);
-    background: var(--surface);
-  }
-
-  article:hover {
-    border-color: var(--line);
-    box-shadow: var(--shadow);
-  }
-
-  header {
-    display: flex;
-    justify-content: space-between;
-    color: var(--warm);
-    font-family: ui-monospace, monospace;
-    font-size: 0.75rem;
-  }
-
-  small {
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .featured {
+    color: var(--yellow);
   }
 
   h2 {
-    margin-block-start: 1.5rem;
+    color: var(--panel-title);
     font-size: 1.75rem;
   }
 
-  article > p {
-    margin-block-start: 0.625rem;
-    color: var(--text-muted);
-  }
-
-  ul {
-    display: flex;
-    margin: 1rem 0 0;
-    padding: 0;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    list-style: none;
-  }
-
-  .stack li {
-    padding: 0.125rem 0.5rem;
-    border: 1px solid var(--line-soft);
-    border-radius: 999px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+  .summary {
+    margin-block: 0.5rem 1rem;
+    color: var(--panel-muted);
   }
 
   .project-links {
-    margin-block-start: 1.5rem;
+    display: flex;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    list-style: none;
   }
 
   .project-links a {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    color: var(--accent-strong);
+    color: var(--cyan);
+    font-family: var(--font-mono);
     font-size: 0.85rem;
-    font-weight: 650;
+    font-weight: 700;
     text-decoration: none;
+  }
+
+  .project-links a:hover { color: var(--yellow); }
+
+  .empty p:not(.panel-label) { color: var(--panel-ink); }
+  .empty p + p { margin-block-start: 0.35rem; }
+
+  .empty a {
+    color: var(--yellow);
+    font-weight: 700;
   }
 </style>
